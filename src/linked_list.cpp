@@ -8,60 +8,146 @@
 namespace itis {
 
 void LinkedList::Add(Element e) {
-  // Tip 1: создайте узел в куче со переданным значением
-  // Tip 2: есть 2 случая - список пустой и непустой
-  // Tip 3: не забудьте обновить поля head и tail
-  // напишите свой код здесь ...
+    if(head_ == nullptr){
+        Node *node = new Node(e, nullptr);
+        head_ = node;
+        tail_ = node;
+
+    }else{
+        Node *node = new Node(e, nullptr);
+        Node *previous_node = tail_;
+        previous_node->next = node;
+        tail_ = node;
+    }
+
+    size_++;
 }
 
 void LinkedList::Insert(int index, Element e) {
-  internal::check_out_of_range(index, 0, size_ + 1);
+    internal::check_out_of_range(index, 0, size_ + 1);
 
-  // Tip 1: вставка элементов на позицию size эквивалентно операции добавления в конец
-  // Tip 2: рассмотрите несколько случаев:
-  //        (1) список пустой,
-  //        (2) добавляем в начало списка,
-  //        (3) добавляем в конец списка
-  //        (4) все остальное
+    if (head_ == nullptr) {
+        Node *newNode = new Node(e, nullptr);
+        head_ = newNode;
+        tail_ = newNode;
+    }
 
-  // напишите свой код здесь ...
+    if (index == size_) {
+        Node *newNode = new Node(e, nullptr);
+        tail_->next = newNode;
+        tail_ = newNode;
+    }
+
+    if (index == 0) {
+        Node *newNode = new Node(e, head_);
+        newNode->next = head_;
+        head_ = newNode;
+    }
+
+    if(index > 0 && index < size_){
+        Node *previousNode = find_node(index-1);
+        Node *newNode = new Node(e, find_node(index));
+        previousNode->next = newNode;
+    }
+
+    size_++;
 }
 
 void LinkedList::Set(int index, Element e) {
   internal::check_out_of_range(index, 0, size_);
-  // Tip 1: используйте функцию find_node(index)
-  // напишите свой код здесь ...
+  Node *node = find_node(index);
+  node->data = e;
 }
 
 Element LinkedList::Remove(int index) {
   internal::check_out_of_range(index, 0, size_);
-  // Tip 1: рассмотрите случай, когда удаляется элемент в начале списка
-  // Tip 2: используйте функцию find_node(index)
-  // напишите свой код здесь ...
-  return {};
+  Element element;
+
+  if(index == 0){
+      Node *node = head_;
+      Node *nextNode = node->next;
+      element = node->data;
+
+      delete node;
+
+      head_ = nextNode;
+      size_--;
+
+  } else{
+      Node *previousNode = find_node(index - 1);
+      Node *currentNode = find_node(index);
+      Node *nextNode = currentNode->next;
+      element = currentNode->data;
+
+      delete currentNode;
+
+      previousNode->next = nextNode;
+      size_--;
+  }
+
+  return element;
 }
 
 void LinkedList::Clear() {
-  // Tip 1: люди в черном (MIB) пришли стереть вам память
-  // напишите свой код здесь ...
+    if(head_ == nullptr){
+        return;
+    }
+
+    Node *node = head_;
+
+    while(node != nullptr){
+        Node *nextNode = node->next;
+
+        delete node;
+
+        node = nextNode;
+        head_ = nextNode;
+        size_--;
+    }
+
+    tail_ = nullptr;
 }
 
 Element LinkedList::Get(int index) const {
   internal::check_out_of_range(index, 0, size_);
-  // напишите свой код здесь ...
-  return {};
+  return find_node(index)->data;
 }
 
 int LinkedList::IndexOf(Element e) const {
-  // напишите свой код здесь ...
-  return {};
+    int counter = 0;
+
+    for(Node *i = head_; i != nullptr; i = i->next){
+        if(i->data == e){
+            return counter;
+        }
+
+        counter++;
+    }
+
+    return 0;
 }
 
 Node *LinkedList::find_node(int index) const {
   assert(index >= 0 && index < size_);
-  // Tip 1: можете сразу обработать случаи поиска начала и конца списка
-  // напишите свой код здесь ...
-  return {};
+  int counter = 0;
+
+  if(index == 0){
+      return head_;
+  }
+
+  if(index == size_ - 1){
+      return tail_;
+  }
+
+  for(Node *i = head_; i != nullptr; i = i->next){
+      if(counter == index){
+          return i;
+      }
+
+      counter++;
+  }
+
+  return nullptr;
 }
 
 // РЕАЛИЗОВАНО
@@ -84,7 +170,7 @@ bool LinkedList::IsEmpty() const {
 }
 
 Element LinkedList::tail() const {
-  // вместо выброса ошибки в случае nullptr, римским парламентов было решено возвращать "специальное" значение
+  // вместо выброса ошибки в случае nullptr, римским парламентом было решено возвращать "специальное" значение
   return tail_ ? tail_->data : Element::UNINITIALIZED;
 }
 
