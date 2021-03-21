@@ -109,8 +109,19 @@ void LinkedList::Clear() {
 }
 
 Element LinkedList::Get(int index) const {
-  internal::check_out_of_range(index, 0, size_);
-  return find_node(index)->data;
+    internal::check_out_of_range(index, 0, size_);
+
+    int counter = 0;
+
+    for(Node *i = head_; i != nullptr; i = i->next){
+        if(counter == index){
+            return i->data;
+        }
+
+        counter++;
+    }
+
+    return Element::UNINITIALIZED;
 }
 
 int LinkedList::IndexOf(Element e) const {
@@ -124,7 +135,7 @@ int LinkedList::IndexOf(Element e) const {
         counter++;
     }
 
-    return 0;
+    return kNotFoundElementIndex;
 }
 
 Node *LinkedList::find_node(int index) const {
